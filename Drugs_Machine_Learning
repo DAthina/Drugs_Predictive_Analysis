@@ -35,10 +35,18 @@ import shap
 
 
 df = pd.read_csv('../input/UCIdrug_train.csv')
-
 test = pd.read_csv('../input/UCIdrug_test.csv')
 df.head()
 df.head()
+
+#Change date format
+
+df = df.rename(columns={"Unnamed: 0": "uniqueID"})
+df['date'] = pd.to_datetime(df['date'])
+
+train = train.rename(columns = {"Unnamed: 0": "uniqueID"})
+train['date'] = pd.to_datetime(train['date'])
+
 
 data = pd.concat([df, test])
 data.head()
