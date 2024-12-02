@@ -47,6 +47,48 @@ df['date'] = pd.to_datetime(df['date'])
 train = train.rename(columns = {"Unnamed: 0": "uniqueID"})
 train['date'] = pd.to_datetime(train['date'])
 
+#clean text
+def clean_text(text):
+    '''Text Preprocessing '''
+    # Convert words to lower case
+    text = text.lower()
+    # Expand contractions
+    if True:
+        text = text.split()
+        new_text = []
+        for word in text:
+            if word in contractions:
+                new_text.append(contractions[word])
+            else:
+                new_text.append(word)
+        text = " ".join(new_text)
+    # Format words and remove unwanted characters
+    text = re.sub(r'https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\<a href', ' ', text)
+    text = re.sub(r'&amp;', '', text)
+    text = re.sub(r'[_"\-;%()|+&=*%.,!?:#$@\[\]/]', ' ', text)
+    text = re.sub(r'<br />', ' ', text)
+    text = re.sub(r'\'', ' ', text)
+    text = re.sub(r'\d+','', text)
+    # remove stopwords
+    if remove_stopwords:
+        text = text.split()
+        stops = set(stopwords.words("english"))
+        text = [w for w in text if not w in stops]
+        text = " ".join(text)
+    # Tokenize each word
+    text =  nltk.WordPunctTokenizer().tokenize(text)
+    # Stemming
+#     lemm = nltk.stem.WordNetLemmatizer()
+#     text = list(map(lambda word:list(map(lemm.lemmatize, word)), text))
+    
+    stemmer_snowball = SnowballStemmer('english')
+    stem_words = []
+    for w in text:
+        x = stemmer_snowball.stem(w)
+        stem_words.append(x)
+    return stem_words
+
 
 data = pd.concat([df, test])
 data.head()
@@ -656,46 +698,6 @@ contractions = {
 }
 
 
-def clean_text(text):
-    '''Text Preprocessing '''
-    # Convert words to lower case
-    text = text.lower()
-    # Expand contractions
-    if True:
-        text = text.split()
-        new_text = []
-        for word in text:
-            if word in contractions:
-                new_text.append(contractions[word])
-            else:
-                new_text.append(word)
-        text = " ".join(new_text)
-    # Format words and remove unwanted characters
-    text = re.sub(r'https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\<a href', ' ', text)
-    text = re.sub(r'&amp;', '', text)
-    text = re.sub(r'[_"\-;%()|+&=*%.,!?:#$@\[\]/]', ' ', text)
-    text = re.sub(r'<br />', ' ', text)
-    text = re.sub(r'\'', ' ', text)
-    text = re.sub(r'\d+','', text)
-    # remove stopwords
-    if remove_stopwords:
-        text = text.split()
-        stops = set(stopwords.words("english"))
-        text = [w for w in text if not w in stops]
-        text = " ".join(text)
-    # Tokenize each word
-    text =  nltk.WordPunctTokenizer().tokenize(text)
-    # Stemming
-#     lemm = nltk.stem.WordNetLemmatizer()
-#     text = list(map(lambda word:list(map(lemm.lemmatize, word)), text))
-    
-    stemmer_snowball = SnowballStemmer('english')
-    stem_words = []
-    for w in text:
-        x = stemmer_snowball.stem(w)
-        stem_words.append(x)
-    return stem_words
 
 
 
